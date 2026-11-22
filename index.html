@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgroScan AI — O'simliklarni Aniqlovchi Ilova</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #2e7d32;
+      --accent: #66bb6a;
+      --bg: #f1f8e9;
+      --card: #ffffff;
+      --text: #1c281d;
+      --muted: #556b57;
+      --safe-bg: #e8f5e9;
+      --safe-text: #1b5e20;
+      --warn-bg: #fff8e1;
+      --warn-text: #8d6e00;
+      --danger-bg: #ffebee;
+      --danger-text: #b71c1c;
+      --border: #dcedc8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #e8f5e9 0%, #f9fbe7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 14px 48px;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(27, 94, 32, 0.07);
+      margin-bottom: 18px;
+    }
+
+    .api-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .api-box label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .api-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .api-row input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 12px;
+      border: 1px solid #c5e1a5;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .api-row input:focus {
+      border-color: var(--primary-light);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease, background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-light);
+    }
+
+    .btn-secondary {
+      background: #e8f5e9;
+      color: var(--primary);
+      border: 1px solid #c5e1a5;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #dcedc8;
+    }
+
+    .upload-zone {
+      border: 2px dashed #81c784;
+      border-radius: 16px;
+      padding: 26px 16px;
+      text-align: center;
+      background: #f9fff9;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .upload-zone.dragover {
+      background: #e8f5e9;
+      border-color: var(--primary);
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .preview-wrap {
+      margin-top: 18px;
+      text-align: center;
+      display: none;
+    }
+
+    .preview-wrap img {
+      max-width: 100%;
+      max-height: 290px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .analyze-bar {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .samples {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed #dcedc8;
+      text-align: center;
+    }
+
+    .samples-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .sample-chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: #f1f8e9;
+      color: var(--primary);
+      border: 1px solid #c5e1a5;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      background: #dcedc8;
+    }
+
+    .status-msg {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .result-card {
+      display: none;
+    }
+
+    .plant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plant-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .plant-latin {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .safety-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .safety-safe { background: var(--safe-bg); color: var(--safe-text); }
+    .safety-warn { background: var(--warn-bg); color: var(--warn-text); }
+    .safety-danger { background: var(--danger-bg); color: var(--danger-text); }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .info-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .info-box {
+      background: #f9fff7;
+      border: 1px solid #e3f2d3;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .info-box.full {
+      grid-column: 1 / -1;
+    }
+
+    .info-box h3 {
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Ekologiya va AI Loyihasi</div>
+      <h1>AgroScan AI</h1>
+      <p class="subtitle">O‘simlik yoki o‘t rasmini yuklang — sun'iy intellekt uning turini, zararli yoki foydaliligini, parvarishi va oziqlanishini aytib beradi.</p>
+    </header>
+
+    <section class="card api-box">
+      <label for="apiKeyInput">Gemini API kaliti (haqiqiy rasm tahlili uchun; bo‘sh qolsa demo rejim ishlaydi)</label>
+      <div class="api-row">
+        <input id="apiKeyInput" type="password" placeholder="AIzaSy... kalitini kiriting (ixtiyoriy)" />
+        <button id="saveKeyBtn" class="btn btn-secondary" type="button">Saqlash</button>
+      </div>
+      <p class="hint">Eslatma: API kalit faqat brauzeringizda vaqtincha saqlanadi. Kalitsiz ham quyidagi tayyor namunalar orqali ilovani sinab ko‘rishingiz mumkin.</p>
+    </section>
+
+    <section class="card">
+      <div id="dropZone" class="upload-zone">
+        <p style="font-weight: 600; color: var(--primary);">O‘simlik rasmini tanlang yoki shu yerga tashlang</p>
+        <p class="hint" style="margin-top: 4px;">JPG, PNG yoki WEBP formatidagi rasm</p>
+
+        <input id="galleryInput" type="file" accept="image/*" hidden />
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+
+        <div class="upload-actions">
+          <button id="galleryBtn" class="btn btn-secondary" type="button">Galereyadan tanlash</button>
+          <button id="cameraBtn" class="btn btn-secondary" type="button">Kamerada olish</button>
+        </div>
+      </div>
+
+      <div id="previewWrap" class="preview-wrap">
+        <img id="previewImg" alt="Tanlangan o'simlik rasmi" />
+      </div>
+
+      <div class="analyze-bar">
+        <button id="analyzeBtn" class="btn btn-primary" type="button" disabled>AI orqali tahlil qilish</button>
+      </div>
+
+      <div class="samples">
+        <div class="samples-title">Tezkor sinov namunalari (rasmsiz tekshirish uchun):</div>
+        <div class="sample-chips">
+          <button class="chip" type="button" data-sample="chamomile">Moychechak (Foydali)</button>
+          <button class="chip" type="button" data-sample="johnson_grass">G‘umay (Zararli begona o‘t)</button>
+          <button class="chip" type="button" data-sample="mint">Yalpiz (Foydali giyoh)</button>
+        </div>
+      </div>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </section>
+
+    <section id="resultCard" class="card result-card">
+      <div class="plant-header">
+        <div>
+          <div id="plantName" class="plant-name">—</div>
+          <div id="plantLatin" class="plant-latin">—</div>
+        </div>
+        <div id="safetyPill" class="safety-pill safety-safe">—</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <h3>Zararli yoki zararsizligi</h3>
+          <p id="safetyDesc">—</p>
+        </div>
+        <div class="info-box">
+          <h3>Parvarishlash qoidalari</h3>
+          <p id="careDesc">—</p>
+        </div>
+        <div class="info-box">
+          <h3>Oziqlanishi va sug‘orilishi</h3>
+          <p id="nutritionDesc">—</p>
+        </div>
+        <div class="info-box">
+          <h3>Ekologik ahamiyati</h3>
+          <p id="ecologyDesc">—</p>
+        </div>
+        <div class="info-box full">
+          <h3>Qo‘shimcha tavsiya</h3>
+          <p id="extraTip">—</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SAMPLES = {
+      chamomile: {
+        name: "Dorivor moychechak",
+        latin: "Matricaria chamomilla",
+        safetyLevel: "safe",
+        safetyLabel: "Foydali / Zararsiz",
+        safetyDesc: "Inson salomatligi va ekologiya uchun foydali dorivor o‘simlik. Zaharli emas, biroq ekin maydonlarida haddan tashqari ko‘payib ketsa, nazorat qilish tavsiya etiladi.",
+        careDesc: "Quyoshli yoki biroz soyali joylarni yaxshi ko‘radi. Yengil, unumdor va suvni yaxshi o‘tkazadigan tuproqda tez rivojlanadi. Sovuqqa chidamli.",
+        nutritionDesc: "Tuproq o‘ta boy bo‘lishi shart emas; mo‘tadil namlik va bahorda oz miqdorda organik chirindi kifoya. Haddan tashqari azotli o‘g‘it gullashni kamaytiradi.",
+        ecologyDesc: "Asalarilar va foydali hasharotlar uchun muhim nektar manbai, bioxilma-xillikni qo‘llab-quvvatlaydi.",
+        extraTip: "Gullarini to‘liq ochilgan paytda toza hududdan yig‘ib, soyada quritish mumkin."
+      },
+      johnson_grass: {
+        name: "G‘umay (Qamishsimon jo‘xori)",
+        latin: "Sorghum halepense",
+        safetyLevel: "danger",
+        safetyLabel: "Zararli begona o‘t",
+        safetyDesc: "Qishloq xo‘jaligi ekinlari uchun xavfli begona o‘t. Ildizpoyasi orqali tez tarqalib, ekinlarning suv va ozuqasini tortib oladi. Ayrim holatlarda chorva uchun ham xavf tug‘dirishi mumkin.",
+        careDesc: "Parvarishlash emas, balki tomorqa va dalalardan ildizpoyasi bilan kovlab olib tashlash yoki agrotexnik usulda yo‘qotish tavsiya etiladi.",
+        nutritionDesc: "O‘zi juda chidamli va ozuqaga talabchan bo‘lgani sababli o‘g‘it bermang — aks holda yanada tezroq o‘sib ketadi.",
+        ecologyDesc: "Tashlandiq yerlarda tuproqni eroziyadan saqlashi mumkin, ammo ekinzorlarda madaniy o‘simliklarni siqib chiqaradi.",
+        extraTip: "Begona o‘tni urug‘ yetiltirmasdan va ildizini uzib qoldirmasdan bartaraf etish muhim."
+      },
+      mint: {
+        name: "Yalpiz",
+        latin: "Mentha piperita",
+        safetyLevel: "safe",
+        safetyLabel: "Foydali / Zararsiz",
+        safetyDesc: "Zararsiz, xushbo‘y va foydali o‘simlik. Pazandachilik, choy tayyorlash va tabiiy xushbo‘ylantiruvchi sifatida keng qo‘llaniladi.",
+        careDesc: "Yarim soya yoki ertalabki quyosh tushadigan joyni xush ko‘radi. Ildizlari tez yoyilishi uchun cheklangan joy yoki tuvakda ekish qulay.",
+        nutritionDesc: "Namlikni sevadi; issiq kunlarda muntazam sug‘orish va bahorda kompost yoki chirindi bilan oziqlantirish yaxshi hosil beradi.",
+        ecologyDesc: "Yoqimli efir moylari ajratadi va ayrim zararkunanda hasharotlarni chalg‘itishga yordam beradi.",
+        extraTip: "Tuprog‘ini butunlay quritib yubormang, barglari tez so‘liydi."
+      }
+    };
+
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const saveKeyBtn = document.getElementById("saveKeyBtn");
+    const galleryInput = document.getElementById("galleryInput");
+    const cameraInput = document.getElementById("cameraInput");
+    const galleryBtn = document.getElementById("galleryBtn");
+    const cameraBtn = document.getElementById("cameraBtn");
+    const dropZone = document.getElementById("dropZone");
+    const previewWrap = document.getElementById("previewWrap");
+    const previewImg = document.getElementById("previewImg");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const statusMsg = document.getElementById("statusMsg");
+    const resultCard = document.getElementById("resultCard");
+
+    let currentDataUrl = null;
+    let currentMimeType = "image/jpeg";
+
+    const savedKey = localStorage.getItem("agroscan_gemini_key");
+    if (savedKey) apiKeyInput.value = savedKey;
+
+    saveKeyBtn.addEventListener("click", () => {
+      const val = apiKeyInput.value.trim();
+      if (val) {
+        localStorage.setItem("agroscan_gemini_key", val);
+        statusMsg.textContent = "API kalit vaqtincha saqlandi.";
+      } else {
+        localStorage.removeItem("agroscan_gemini_key");
+        statusMsg.textContent = "API kalit tozalandi (demo rejim faol).";
+      }
+    });
+
+    galleryBtn.addEventListener("click", () => galleryInput.click());
+    cameraBtn.addEventListener("click", () => cameraInput.click());
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        statusMsg.textContent = "Iltimos, rasm faylini tanlang.";
+        return;
+      }
+      currentMimeType = file.type;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentDataUrl = e.target.result;
+        previewImg.src = currentDataUrl;
+        previewWrap.style.display = "block";
+        analyzeBtn.disabled = false;
+        statusMsg.textContent = "Rasm yuklandi. «AI orqali tahlil qilish» tugmasini bosing.";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    galleryInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+    cameraInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      handleFile(e.dataTransfer.files[0]);
+    });
+
+    function renderResult(data) {
+      document.getElementById("plantName").textContent = data.name || "Noma'lum o'simlik";
+      document.getElementById("plantLatin").textContent = data.latin || "";
+
+      const pill = document.getElementById("safetyPill");
+      pill.textContent = data.safetyLabel || "Ma'lumot";
+      pill.className = "safety-pill";
+      if (data.safetyLevel === "danger") pill.classList.add("safety-danger");
+      else if (data.safetyLevel === "warn") pill.classList.add("safety-warn");
+      else pill.classList.add("safety-safe");
+
+      document.getElementById("safetyDesc").textContent = data.safetyDesc || "—";
+      document.getElementById("careDesc").textContent = data.careDesc || "—";
+      document.getElementById("nutritionDesc").textContent = data.nutritionDesc || "—";
+      document.getElementById("ecologyDesc").textContent = data.ecologyDesc || "—";
+      document.getElementById("extraTip").textContent = data.extraTip || "—";
+
+      resultCard.style.display = "block";
+      resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const key = chip.dataset.sample;
+        const sample = SAMPLES[key];
+        if (!sample) return;
+        previewWrap.style.display = "none";
+        currentDataUrl = null;
+        analyzeBtn.disabled = true;
+        renderResult(sample);
+        statusMsg.textContent = `«${sample.name}» namunasi bo‘yicha ma'lumot ko‘rsatildi.`;
+      });
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!currentDataUrl) return;
+      const apiKey = apiKeyInput.value.trim() || localStorage.getItem("agroscan_gemini_key") || "";
+
+      if (!apiKey) {
+        statusMsg.textContent = "API kalit kiritilmagani uchun demo natija ko‘rsatilmoqda.";
+        renderResult(SAMPLES.mint);
+        return;
+      }
+
+      analyzeBtn.disabled = true;
+      statusMsg.textContent = "Sun'iy intellekt rasmni tahlil qilmoqda...";
+
+      try {
+        const base64Data = currentDataUrl.split(",")[1];
+        const prompt = `Sen agronom va ekolog mutaxassissan. Rasmdagi o'simlik yoki o'tni aniqla va javobni FAQAT quyidagi JSON formatida, o'zbek tilida qaytar:
+{
+  "name": "O'simlikning o'zbekcha nomi",
+  "latin": "Lotincha ilmiy nomi",
+  "safetyLevel": "safe | warn | danger",
+  "safetyLabel": "Qisqa holat (masalan: Foydali / Zararsiz, Ehtiyotkorlik talab etadi, Zararli begona o't)",
+  "safetyDesc": "Zararli yoki zararsizligi haqida batafsil tushuntirish",
+  "careDesc": "Qanday parvarishlash lozimligi (yorug'lik, tuproq, harorat)",
+  "nutritionDesc": "Qanday oziqlanishi va sug'orilishi",
+  "ecologyDesc": "Ekologik ahamiyati",
+  "extraTip": "Foydali qo'shimcha tavsiya"
+}`;
+
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: currentMimeType, data: base64Data } }
+                ]
+              }],
+              generationConfig: {
+                responseMimeType: "application/json"
+              }
+            })
+          }
+        );
+
+        const json = await response.json();
+        if (!response.ok) {
+          throw new Error(json.error?.message || "API so‘rovida xatolik");
+        }
+
+        const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+        const parsed = JSON.parse(rawText);
+        renderResult(parsed);
+        statusMsg.textContent = "Tahlil muvaffaqiyatli yakunlandi!";
+      } catch (err) {
+        statusMsg.textContent = "Xatolik: " + err.message;
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
