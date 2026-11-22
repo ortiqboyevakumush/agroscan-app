@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "AgroScan AI",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "AgroScan AI",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "description": "O'simliklar va o'tlarni aniqlash hamda zararli/foydali xususiyatlarini tekshirish AI ilovasi"
+}
