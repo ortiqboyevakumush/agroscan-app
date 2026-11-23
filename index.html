@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AgroScan AI — O'simliklarni Aniqlovchi Ilova</title>
-<link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
   <style>
     :root {
       --primary: #1b5e20;
@@ -317,16 +317,16 @@
     <header>
       <div class="badge">Ekologiya va AI Loyihasi</div>
       <h1>AgroScan AI</h1>
-      <p class="subtitle">O‘simlik yoki o‘t rasmini yuklang — sun'iy intellekt uning turini, zararli yoki foydaliligini, parvarishi va oziqlanishini aytib beradi.</p>
+      <p class="subtitle">O‘simlik yoki o‘t rasmini yuklang — sun'iy intellekt uning turini, zararli yoki foydaliligini, parvarishini va oziqlanishini aniqlab beradi.</p>
     </header>
 
     <section class="card api-box">
-      <label for="apiKeyInput">Gemini API kaliti (haqiqiy rasm tahlili uchun; bo‘sh qolsa demo rejim ishlaydi)</label>
+      <label for="apiKeyInput">Gemini API kaliti</label>
       <div class="api-row">
-        <input id="apiKeyInput" type="password" placeholder="AIzaSy... kalitini kiriting (ixtiyoriy)" />
+        <input id="apiKeyInput" type="password" placeholder="AIzaSy... kalitini kiriting" />
         <button id="saveKeyBtn" class="btn btn-secondary" type="button">Saqlash</button>
       </div>
-      <p class="hint">Eslatma: API kalit faqat brauzeringizda vaqtincha saqlanadi. Kalitsiz ham quyidagi tayyor namunalar orqali ilovani sinab ko‘rishingiz mumkin.</p>
+      <p class="hint">Kalit faqat joriy brauzer xotirasida saqlanadi. Pastdagi tayyor o‘simlik kartochkalari orqali ham ma'lumotlarni ko‘rish mumkin.</p>
     </section>
 
     <section class="card">
@@ -348,15 +348,15 @@
       </div>
 
       <div class="analyze-bar">
-        <button id="analyzeBtn" class="btn btn-primary" type="button" disabled>AI orqali tahlil qilish</button>
+        <button id="analyzeBtn" class="btn btn-primary" type="button" disabled>Tahlil qilish</button>
       </div>
 
       <div class="samples">
-        <div class="samples-title">Tezkor sinov namunalari (rasmsiz tekshirish uchun):</div>
+        <div class="samples-title">Tezkor ma'lumot kartochkalari:</div>
         <div class="sample-chips">
-          <button class="chip" type="button" data-sample="chamomile">Moychechak (Foydali)</button>
-          <button class="chip" type="button" data-sample="johnson_grass">G‘umay (Zararli begona o‘t)</button>
-          <button class="chip" type="button" data-sample="mint">Yalpiz (Foydali giyoh)</button>
+          <button class="chip" type="button" data-sample="chamomile">Moychechak</button>
+          <button class="chip" type="button" data-sample="johnson_grass">G‘umay</button>
+          <button class="chip" type="button" data-sample="mint">Yalpiz</button>
         </div>
       </div>
 
@@ -457,10 +457,10 @@
       const val = apiKeyInput.value.trim();
       if (val) {
         localStorage.setItem("agroscan_gemini_key", val);
-        statusMsg.textContent = "API kalit vaqtincha saqlandi.";
+        statusMsg.textContent = "API kalit saqlandi.";
       } else {
         localStorage.removeItem("agroscan_gemini_key");
-        statusMsg.textContent = "API kalit tozalandi (demo rejim faol).";
+        statusMsg.textContent = "API kalit o‘chirildi.";
       }
     });
 
@@ -479,7 +479,7 @@
         previewImg.src = currentDataUrl;
         previewWrap.style.display = "block";
         analyzeBtn.disabled = false;
-        statusMsg.textContent = "Rasm yuklandi. «AI orqali tahlil qilish» tugmasini bosing.";
+        statusMsg.textContent = "Rasm yuklandi. «Tahlil qilish» tugmasini bosing.";
       };
       reader.readAsDataURL(file);
     }
@@ -532,7 +532,7 @@
         currentDataUrl = null;
         analyzeBtn.disabled = true;
         renderResult(sample);
-        statusMsg.textContent = `«${sample.name}» namunasi bo‘yicha ma'lumot ko‘rsatildi.`;
+        statusMsg.textContent = `${sample.name} bo‘yicha ma'lumot ko‘rsatildi.`;
       });
     });
 
@@ -541,17 +541,16 @@
       const apiKey = apiKeyInput.value.trim() || localStorage.getItem("agroscan_gemini_key") || "";
 
       if (!apiKey) {
-        statusMsg.textContent = "API kalit kiritilmagani uchun demo natija ko‘rsatilmoqda.";
-        renderResult(SAMPLES.mint);
+        statusMsg.textContent = "Avval Gemini API kalitini kiriting va saqlang.";
         return;
       }
 
       analyzeBtn.disabled = true;
-      statusMsg.textContent = "Sun'iy intellekt rasmni tahlil qilmoqda...";
+      statusMsg.textContent = "Rasm tahlil qilinmoqda...";
 
       try {
         const base64Data = currentDataUrl.split(",")[1];
-        const prompt = `Sen agronom va ekolog mutaxassissan. Rasmdagi o'simlik yoki o'tni aniqla va javobni FAQAT quyidagi JSON formatida, o'zbek tilida qaytar:
+        const prompt = `Rasmdagi o'simlik yoki o'tni aniqla va javobni FAQAT quyidagi JSON formatida, o'zbek tilida qaytar:
 {
   "name": "O'simlikning o'zbekcha nomi",
   "latin": "Lotincha ilmiy nomi",
@@ -591,7 +590,7 @@
         const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
         const parsed = JSON.parse(rawText);
         renderResult(parsed);
-        statusMsg.textContent = "Tahlil muvaffaqiyatli yakunlandi!";
+        statusMsg.textContent = "Tahlil yakunlandi.";
       } catch (err) {
         statusMsg.textContent = "Xatolik: " + err.message;
       } finally {
